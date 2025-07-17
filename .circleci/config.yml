@@ -3,7 +3,7 @@ version: 2.1
 jobs:
   build-hugo:
     docker:
-      - image: klakegg/hugo:0.124.1-ext-alpine
+      - image: klakegg/hugo:ext
     steps:
       - checkout
 
