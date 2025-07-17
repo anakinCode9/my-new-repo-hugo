@@ -3,7 +3,7 @@ version: 2.1
 jobs:
   build-hugo:
     docker:
-      - image: klakegg/hugo:ext
+      - image: ghcr.io/gohugoio/hugo:0.124.1
     steps:
       - checkout
 
