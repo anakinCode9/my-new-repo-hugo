@@ -3,10 +3,10 @@ version: 2.1
 jobs:
   build-hugo:
     docker:
-      - image: cibuilds/hugo:latest
+      - image: klakegg/hugo:0.124.1-ext-alpine
     steps:
       - checkout
-      
+
       - run:
           name: Init Git submodules (themes etc.)
           command: git submodule update --init --recursive
