@@ -4,7 +4,7 @@ version: 2.1
 jobs:
   build-hugo:
     docker:
-      - image: cibuilds/hugo:latest
+      - image: klakegg/hugo:ext
     steps:
       - checkout
 
