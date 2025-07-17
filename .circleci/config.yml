@@ -3,7 +3,7 @@ version: 2.1
 jobs:
   build-hugo:
     docker:
-      - image: ghcr.io/gohugoio/hugo:0.124.1
+      - image: ghcr.io/gohugoio/hugo:latest
     steps:
       - checkout
 
