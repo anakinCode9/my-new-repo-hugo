@@ -1,0 +1,56 @@
+version: 1.1
+
+jobs:
+  build-hugo:
+    docker:
+      - image: cibuilds/hugo:latest
+    steps:
+      - checkout
+
+      - run:
+          name: Build Hugo site
+          command: hugo
+
+      - run:
+          name: Copy build artifacts
+          command: |
+            mkdir -p ~/artifacts
+            cp -R public/* ~/artifacts
+
+      - persist_to_workspace:
+          root: ~/artifacts
+          paths:
+            - .
+
+  deploy:
+    docker:
+      - image: cimg/aws:2023.12
+    steps:
+      - checkout
+      - attach_workspace:
+          at: ~/artifacts
+
+      - run:
+          name: Assume deploy role
+          command: |
+            CREDS_JSON=$(aws sts assume-role \
+              --role-arn arn:aws:iam::915920435036:role/circleci-deploy-role \
+              --role-session-name circleci-session)
+
+            echo "export AWS_ACCESS_KEY_ID=$(echo $CREDS_JSON | jq -r .Credentials.AccessKeyId)" >> $BASH_ENV
+            echo "export AWS_SECRET_ACCESS_KEY=$(echo $CREDS_JSON | jq -r .Credentials.SecretAccessKey)" >> $BASH_ENV
+            echo "export AWS_SESSION_TOKEN=$(echo $CREDS_JSON | jq -r .Credentials.SessionToken)" >> $BASH_ENV
+
+      - run:
+          name: Deploy to S3
+          command: |
+            aws s3 sync ~/artifacts s3://circleci-bucket-x/ --delete --region eu-north-1
+
+workflows:
+  build-and-deploy:
+    jobs:
+      - build-hugo
+      - deploy:
+          requires:
+            - build-hugo
+
